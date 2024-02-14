@@ -3,8 +3,8 @@ module FastPerms
 using Random
 
 include("check_image.jl")
-include("abstract_perm.jl")
-include("s_perm.jl")
+include("AbstractPerm.jl")
+include("SPerm.jl")
 
 export AbstractPerm
 export SPerm

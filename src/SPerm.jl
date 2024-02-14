@@ -10,6 +10,10 @@ struct SPerm{N,T} <: AbstractPerm{N,T}
 end
 
 # Constructors
+Base.@propagate_inbounds SPerm{N,T}(images::NTuple{N}) where {N,T} = SPerm{N,T}(NTuple{N,T}(images))
+Base.@propagate_inbounds SPerm{N,T}(images::Integer...) where {N,T} = SPerm{N,T}(tuple(images...))
+Base.@propagate_inbounds SPerm{N,T}(images::AbstractArray) where {N,T} = SPerm{N,T}(Tuple(images))
+
 Base.@propagate_inbounds SPerm(images::NTuple{N,T}) where {N,T} = SPerm{N,T}(images)
 Base.@propagate_inbounds SPerm(images::Integer...) = SPerm(tuple(images...))
 Base.@propagate_inbounds SPerm(images::AbstractArray) = SPerm(Tuple(images))
