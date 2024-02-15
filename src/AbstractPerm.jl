@@ -1,6 +1,9 @@
 # The abstract type of all permutation types
 abstract type AbstractPerm{N,T} <: AbstractVector{T} end
 
+# Static information
+Base.length(::Type{<:AbstractPerm{N}}) where {N} = N
+
 # Treating permutation as a vector
 Base.size(::AbstractPerm{N,T}) where {N,T} = (N,)
 

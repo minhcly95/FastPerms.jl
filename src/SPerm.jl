@@ -71,12 +71,3 @@ _mul_collect(a::SPerm{N,T}, b::SPerm{N,T}) where {N,T} = @inbounds SPerm(NTuple{
     end
 end
 
-# Random
-function Random.rand(rng::AbstractRNG, ::Random.SamplerType{SPerm{N,T}}) where {N,T}
-    return @inbounds SPerm(shuffle(rng, UnitRange{T}(1:N)))
-end
-
-function Random.rand(rng::AbstractRNG, ::Random.SamplerType{SPerm{N}}) where {N}
-    return rand(rng, SPerm{N,Int})
-end
-

@@ -1,34 +1,38 @@
-@testset "SPerm" begin
-    for N in [4, 8, 16, 32, 64, 128], T in [Int, UInt8]
-        # Test for various parameters of N and T
-        S = SPerm{N,T}
-        @testset "$S" begin
-            NSAMPLES = 10
+@testset "General operations" begin
+    perm_types = [
+        [SPerm{N,T} for N in [4, 8, 16, 32, 64, 128], T in [Int, UInt8]]...,
+        [CPerm{N} for N in [4, 8, 12, 16]]...
+    ]
+    NSAMPLES = 10
+
+    for P in perm_types
+        @testset "$P" begin
+            N, T = length(P), eltype(P)
 
             # Random permutations to test
-            As = rand(S, NSAMPLES)
-            Bs = rand(S, NSAMPLES)
+            As = rand(P, NSAMPLES)
+            Bs = rand(P, NSAMPLES)
 
             # Identity
-            @test identity_perm(S) == 1:N
+            @test identity_perm(P) == 1:N
             @test identity_perm(As[1]) == 1:N
-            @test one(S) == 1:N
+            @test one(P) == 1:N
             @test one(Bs[1]) == 1:N
 
             # Invalid bound check
             # (0,...,0) is not a permutation
-            @test_throws ArgumentError S(zeros(T, N))
+            @test_throws ArgumentError P(zeros(T, N))
             # (1,...,1) is not a permutation
-            @test_throws ArgumentError S(ones(T, N))
+            @test_throws ArgumentError P(ones(T, N))
             # Non-injective image
-            @test_throws ArgumentError S([1,1,3:N...])
+            @test_throws ArgumentError P([1, 1, 3:N...])
 
             # Valid bound check
             # Identity is valid
-            @test S(one(S)) isa Any
+            @test P(one(P)) isa Any
             for a in As
                 # Every random perm is valid
-                @test S(a) isa Any
+                @test P(a) isa Any
             end
 
             # Get image
@@ -43,14 +47,14 @@
                 @test b * a == [a(b(i)) for i in 1:N]
                 @test b ∘ a == a * b
                 @test a ∘ b == b * a
-                @test a * one(S) == a
-                @test one(S) * a == a
+                @test a * one(P) == a
+                @test one(P) * a == a
             end
 
             # Inverse
             for (a, b) in zip(As, Bs)
-                @test a * inv(a) == one(S)
-                @test inv(a) * a == one(S)
+                @test a * inv(a) == one(P)
+                @test inv(a) * a == one(P)
                 @test inv(a * b) == inv(b) * inv(a)
                 @test inv(b * a) == inv(a) * inv(b)
             end
@@ -60,12 +64,12 @@
                 @test conj(a, b) == b * a * inv(b)
                 @test conj(b, a) == a * b * inv(a)
                 @test conj(conj(a, b), inv(b)) == a
-                @test conj(a, b) * conj(inv(a), b) == one(S)
+                @test conj(a, b) * conj(inv(a), b) == one(P)
             end
 
             # Power
             for a in As
-                @test a^0 == one(S)
+                @test a^0 == one(P)
                 @test a^1 == a
                 @test a^2 == a * a
                 @test a^3 == a * a * a

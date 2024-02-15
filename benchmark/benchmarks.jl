@@ -3,11 +3,17 @@ using BenchmarkTools
 
 SUITE = BenchmarkGroup()
 
-SUITE["SPerm"] = BenchmarkGroup()
-for N in [4, 8, 16, 32, 64, 128], T in [Int, UInt8]
+for N in [4, 8, 12, 16, 24, 32, 48, 64, 128], T in [Int, UInt8]
     S = SPerm{N,T}
-    SUITE["SPerm"]["$S"] = BenchmarkGroup()
-    SUITE["SPerm"]["$S"]["mul"] = @benchmarkable a * b setup=(a=rand($S);b=rand($S))
-    SUITE["SPerm"]["$S"]["inv"] = @benchmarkable inv(a) setup=(a=rand($S))
+    SUITE["$S"] = BenchmarkGroup(["SPerm", N, T])
+    SUITE["$S"]["mul"] = @benchmarkable a * b setup=(a=rand($S);b=rand($S))
+    SUITE["$S"]["inv"] = @benchmarkable inv(a) setup=(a=rand($S))
+end
+
+for N in [4, 8, 12, 16]
+    C = CPerm{N}
+    SUITE["$C"] = BenchmarkGroup(["CPerm", N])
+    SUITE["$C"]["mul"] = @benchmarkable a * b setup=(a=rand($C);b=rand($C))
+    SUITE["$C"]["inv"] = @benchmarkable inv(a) setup=(a=rand($C))
 end
 

@@ -2,5 +2,5 @@ using FastPerms
 using Test
 
 @testset "FastPerms.jl" begin
-    include("SPerm.jl")
+    include("general_ops.jl")
 end
