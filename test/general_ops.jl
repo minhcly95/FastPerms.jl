@@ -1,7 +1,8 @@
 @testset "General operations" begin
     perm_types = [
         [SPerm{N,T} for N in [4, 8, 16, 32, 64, 128], T in [Int, UInt8]]...,
-        [CPerm{N} for N in [4, 8, 12, 16]]...
+        [CPerm{N} for N in [4, 8, 12, 16]]...,
+        [LPerm{N} for N in [2, 3, 4, 5]]...
     ]
     NSAMPLES = 10
 

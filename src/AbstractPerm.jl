@@ -7,6 +7,12 @@ Base.length(::Type{<:AbstractPerm{N}}) where {N} = N
 # Treating permutation as a vector
 Base.size(::AbstractPerm{N,T}) where {N,T} = (N,)
 
+# Get total number of permutations of N items
+num_perms(::Val{1}) = 1
+num_perms(::Val{N}) where {N} = num_perms(Val{N-1}()) * N
+num_perms(::AbstractPerm{N}) where {N} = num_perms(Val{N}())
+num_perms(::Type{<:AbstractPerm{N}}) where {N} = num_perms(Val{N}())
+
 # Treating permutation as a function
 Base.@propagate_inbounds (a::AbstractPerm)(i::Integer) = a[i]
 
