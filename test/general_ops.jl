@@ -8,7 +8,7 @@
 
     for P in perm_types
         @testset "$P" begin
-            N, T = length(P), eltype(P)
+            N, T = degree(P), eltype(P)
 
             # Random permutations to test
             As = rand(P, NSAMPLES)

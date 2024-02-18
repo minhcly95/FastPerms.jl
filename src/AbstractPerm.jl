@@ -1,11 +1,16 @@
 # The abstract type of all permutation types
-abstract type AbstractPerm{N,T} <: AbstractVector{T} end
+abstract type AbstractPerm{N} <: AbstractVector{Int} end
 
-# Static information
-Base.length(::Type{<:AbstractPerm{N}}) where {N} = N
+# Degree = number of elements on which the permutation acts
+degree(::Type{<:AbstractPerm{N}}) where {N} = N
 
 # Treating permutation as a vector
-Base.size(::AbstractPerm{N,T}) where {N,T} = (N,)
+Base.size(::AbstractPerm{N}) where {N} = (N,)
+
+# Get all the images as a tuple
+@generated function images(a::AbstractPerm{N}) where {N}
+    return Expr(:tuple, [:(@inbounds a[$i]) for i in 1:N]...)
+end
 
 # Get total number of permutations of N items
 num_perms(::Val{1}) = 1
@@ -16,12 +21,15 @@ num_perms(::Type{<:AbstractPerm{N}}) where {N} = num_perms(Val{N}())
 # Treating permutation as a function
 Base.@propagate_inbounds (a::AbstractPerm)(i::Integer) = a[i]
 
+# General multiplication
+Base.:*(a::AbstractPerm, b::AbstractPerm) = *(promote(a,b)...)
+
 # Use composition to multiply from right-to-left
 Base.:∘(a::AbstractPerm, b::AbstractPerm) = b * a
 
 # Identity
-@generated function identity_perm(type::Type{<:AbstractPerm{N,T}}) where {N,T}
-    id_tuple = Expr(:tuple, UnitRange{T}(1,N)...)
+@generated function identity_perm(type::Type{<:AbstractPerm{N}}) where {N}
+    id_tuple = Tuple(1:N)
     return quote
         return @inbounds type($id_tuple)
     end

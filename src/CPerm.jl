@@ -1,12 +1,16 @@
+# Limit N up to 16
+const CPERM_MAX_N = 16
+
 # Permutation stored as an UInt in a compact way.
 # Each image is stored in 4-bit (0-15) and is manipulated using bitwise operators.
 # C in CPerm stands for "Compact".
-struct CPerm{N} <: AbstractPerm{N,Int}
+struct CPerm{N} <: AbstractPerm{N}
     data::UInt64
 
-    function CPerm{N}(images::NTuple{N}) where {N}
-        @boundscheck check_valid_image(images)
-        new{N}(_compactify(images))
+    # Special constructor to distinguish from the outer constructors
+    # Warning: unsafe (there is no check)
+    function CPerm(::Val{N}, ::Val{false}, data::UInt64) where {N}
+        new{N}(data)
     end
 end
 
@@ -14,8 +18,8 @@ end
 # We store the images in the order [15, 14, ..., 2, 1, 16] (MSB first)
 # because Julia indices start from 1.
 @generated function _compactify(images::NTuple{N}) where {N}
-    if N > 16
-        throw(ArgumentError("CPerm{N} does not support N > 16"))
+    if N > CPERM_MAX_N
+        throw(ArgumentError("CPerm{N} does not support N > $CPERM_MAX_N"))
     else
         exprs = vcat(:(a = UInt64(0)), (:(a |= images[$i] & 0xf; a <<= 4) for i in min(N, 15):-1:1)...)
         (N == 16) && push!(exprs, :(a |= images[16] & 0xf))
@@ -23,20 +27,38 @@ end
     end
 end
 
-# Make CPerm in an unsafe way
-function _make_cperm_unsafe(data::UInt64, ::Val{N}) where {N}
-    ref = Ref{CPerm{N}}()
-    GC.@preserve ref unsafe_store!(Base.unsafe_convert(Ptr{UInt64}, pointer_from_objref(ref)), data)
-    return ref[]
-end
-
 # Constructor
-Base.@propagate_inbounds CPerm{N}(images::Integer...) where {N} = CPerm{N}(tuple(images...))
-Base.@propagate_inbounds CPerm{N}(images::AbstractArray) where {N} = CPerm{N}(Tuple(images))
+@generated function CPerm(::Val{N}, images::NTuple{M}) where {N,M}
+    check_expr = :(@boundscheck check_valid_image(images))
+    if M > CPERM_MAX_N
+        # Return an SPerm{M} if there are too many elements
+        return :($check_expr; return SPerm{N}(images))
+    elseif M == N
+        # Real constructor
+        return quote
+            $check_expr
+            data = _compactify(images)
+            # Call the inner constructor
+            return CPerm(Val{$N}(), Val{false}(), data)
+        end
+    elseif M > N
+        # Given image has same or more elements: construct an CPerm{M} (ignore N)
+        return :($check_expr; return @inbounds CPerm(Val{$M}(), images))
+    else
+        # Given image has fewer elements: pad missing elements
+        return :($check_expr; return @inbounds CPerm(Val{$N}(), (images..., $(M+1:N)...)))
+    end
+end
+Base.@propagate_inbounds CPerm(::Val{N}, images::Integer...) where {N} = CPerm(Val{N}(), Tuple(images))
+Base.@propagate_inbounds CPerm(::Val{N}, images::AbstractArray) where {N} = CPerm(Val{N}(), Tuple(images))
+CPerm(::Val{N}, perm::AbstractPerm) where {N} = @inbounds CPerm(Val{N}(), images(perm))
 
-Base.@propagate_inbounds CPerm(images::NTuple{N}) where {N} = CPerm{N}(images)
-Base.@propagate_inbounds CPerm(images::Integer...) = CPerm(tuple(images...))
+Base.@propagate_inbounds CPerm{N}(images...) where {N} = CPerm(Val{N}(), images...)
+
+Base.@propagate_inbounds CPerm(images::NTuple{N}) where {N} = CPerm(Val{N}(), images)
+Base.@propagate_inbounds CPerm(images::Integer...) = CPerm(Tuple(images))
 Base.@propagate_inbounds CPerm(images::AbstractArray) = CPerm(Tuple(images))
+CPerm(perm::AbstractPerm) = @inbounds CPerm(images(perm))
 
 CPerm{N}() where {N} = identity_perm(CPerm{N})
 
@@ -72,7 +94,7 @@ end
 
         $store_block
 
-        return _make_cperm_unsafe(cc, Val{$N}())
+        return CPerm(Val{$N}(), Val{false}(), cc)
     end
 end
 
@@ -97,7 +119,7 @@ end
 
         $store_block
 
-        return _make_cperm_unsafe(cc, Val{$N}())
+        return CPerm(Val{$N}(), Val{false}(), cc)
     end
 end
 

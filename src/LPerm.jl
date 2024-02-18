@@ -3,14 +3,12 @@ const LPERM_MAX_N = 5
 
 # Permutation where mul and inv are done via lookup tables.
 # L in LPerm stands for "Lookup".
-struct LPerm{N} <: AbstractPerm{N,Int}
+struct LPerm{N} <: AbstractPerm{N}
     data::UInt8
 
-    function LPerm(::Val{N}, data::Integer) where {N}
-        @boundscheck begin
-            M = num_perms(Val{N}())
-            data in 1:M || throw(ArgumentError("index out of range (must be in 1:$M)"))
-        end
+    # Special constructor to distinguish from the outer constructors
+    # Warning: unsafe (there is no check)
+    function LPerm(::Val{N}, ::Val{false}, data::Integer) where {N}
         new{N}(data & 0xff)
     end
 end
@@ -51,27 +49,46 @@ end
 const LPERM_TO_TUPLE, TUPLE_TO_LPERM = Tuple.(_make_lperm_tuple_tables())
 
 # Constructors
-@generated function LPerm{N}(images::NTuple{N}) where {N}
+@generated function LPerm(::Val{N}, images::NTuple{M}) where {N,M}
+    check_expr = :(@boundscheck check_valid_image(images))
+    if M > LPERM_MAX_N
+        # Return an SPerm{M} if there are too many elements
+        return :($check_expr; return SPerm{M}(images))
+    elseif M == N
+        # Real constructor
+        return quote
+            $check_expr
+            hash = _lperm_encode(images)
+            # Call the inner constructor
+            return @inbounds LPerm(Val{$N}(), Val{false}(), TUPLE_TO_LPERM[hash])
+        end
+    elseif M > N
+        # Given image has more elements: construct an LPerm{M} (ignore N)
+        return :($check_expr; return @inbounds LPerm(Val{$M}(), images))
+    else
+        # Given image has fewer elements: pad missing elements
+        return :($check_expr; return @inbounds LPerm(Val{$N}(), (images..., $(M+1:N)...)))
+    end
+end
+Base.@propagate_inbounds LPerm(::Val{N}, images::Integer...) where {N} = LPerm(Val{N}(), Tuple(images))
+Base.@propagate_inbounds LPerm(::Val{N}, images::AbstractArray) where {N} = LPerm(Val{N}(), Tuple(images))
+LPerm(::Val{N}, perm::AbstractPerm) where {N} = @inbounds LPerm(Val{N}(), images(perm))
+
+Base.@propagate_inbounds LPerm{N}(images...) where {N} = LPerm(Val{N}(), images...)
+
+Base.@propagate_inbounds LPerm(images::NTuple{N}) where {N} = LPerm(Val{N}(), images)
+Base.@propagate_inbounds LPerm(images::Integer...) = LPerm(Tuple(images))
+Base.@propagate_inbounds LPerm(images::AbstractArray) = LPerm(Tuple(images))
+LPerm(perm::AbstractPerm) = @inbounds LPerm(images(perm))
+
+# The identity of LPerm{N} is always 1
+@generated function identity_perm(::Type{LPerm{N}}) where {N}
     if N > LPERM_MAX_N
         throw(ArgumentError("LPerm{N} does not support N > $LPERM_MAX_N"))
     else
-        return quote
-            @boundscheck check_valid_image(images)
-            hash = _lperm_encode(images)
-            return @inbounds LPerm(Val{N}(), TUPLE_TO_LPERM[hash])
-        end
+        return :(LPerm(Val{N}(), Val{false}(), 1))
     end
 end
-
-Base.@propagate_inbounds LPerm{N}(images::Integer...) where {N} = LPerm{N}(tuple(images...))
-Base.@propagate_inbounds LPerm{N}(images::AbstractArray) where {N} = LPerm{N}(Tuple(images))
-
-Base.@propagate_inbounds LPerm(images::NTuple{N}) where {N} = LPerm{N}(images)
-Base.@propagate_inbounds LPerm(images::Integer...) = LPerm(tuple(images...))
-Base.@propagate_inbounds LPerm(images::AbstractArray) = LPerm(Tuple(images))
-
-# The identity of LPerm{N} is always 1
-identity_perm(::Type{LPerm{N}}) where {N} = @inbounds LPerm(Val{N}(), 1)
 LPerm{N}() where {N} = identity_perm(LPerm{N})
 
 # Get image
@@ -84,7 +101,7 @@ end
 function _make_lperm_mul_inv_tables()
     N = LPERM_MAX_N
     M = num_perms(Val{N}())
-    all_perms = SPerm.(LPerm.(Val{N}(), 1:M))
+    all_perms = SPerm.(LPerm.(Val{N}(), Val{false}(), 1:M))
     mul_table = Matrix{UInt8}(UndefInitializer(), M, M)
 
     # We use SPerm to calculate the product,
@@ -106,15 +123,15 @@ const LPERM_MUL, LPERM_INV = Tuple.(_make_lperm_mul_inv_tables())
 
 # Multiply from left to right (the left permutation applies first)
 function Base.:*(a::LPerm{N}, b::LPerm{N}) where {N}
-    # Just look it up in the table
+    # Just look it up in the table and use the inner constructor
     M = num_perms(Val{LPERM_MAX_N}())
     ind = Base._sub2ind((M,M), a.data, b.data)
-    return @inbounds LPerm(Val{N}(), LPERM_MUL[ind])
+    return @inbounds LPerm(Val{N}(), Val{false}(), LPERM_MUL[ind])
 end
 
 # Inverse
 function Base.:inv(a::LPerm{N}) where {N}
-    # Just look it up in the table
-    return @inbounds LPerm(Val{N}(), LPERM_INV[a.data])
+    # Just look it up in the table and use the inner constructor
+    return @inbounds LPerm(Val{N}(), Val{false}(), LPERM_INV[a.data])
 end
 

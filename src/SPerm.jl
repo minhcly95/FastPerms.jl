@@ -1,27 +1,45 @@
 # Permutation stored as a static array (a tuple)
 # Tuples are stack-allocated, which is extremely fast in Julia.
-struct SPerm{N,T} <: AbstractPerm{N,T}
+using Base: InterpreterIP
+struct SPerm{N,T} <: AbstractPerm{N}
     images::NTuple{N,T}
 
-    function SPerm{N,T}(images::NTuple{N,T}) where {N,T}
+    function SPerm(::Val{N}, ::Type{T}, images::NTuple{N,T}) where {N,T}
         @boundscheck check_valid_image(images)
         new{N,T}(images)
     end
 end
 
 # Constructors
-Base.@propagate_inbounds SPerm{N,T}(images::NTuple{N}) where {N,T} = SPerm{N,T}(NTuple{N,T}(images))
-Base.@propagate_inbounds SPerm{N,T}(images::Integer...) where {N,T} = SPerm{N,T}(tuple(images...))
-Base.@propagate_inbounds SPerm{N,T}(images::AbstractArray) where {N,T} = SPerm{N,T}(Tuple(images))
+@generated function SPerm(::Val{N}, ::Type{T}, images::NTuple{M,T}) where {N,M,T}
+    check_expr = :(@boundscheck check_valid_image(images))
+    if M >= N
+        # Given image has same or more elements: construct an SPerm{M,T} (ignore N)
+        return :($check_expr; return @inbounds SPerm(Val{$M}(), $T, images))
+    else
+        # Given image has fewer elements: pad missing elements
+        return :($check_expr; return @inbounds SPerm(Val{$N}(), $T, (images..., $(UnitRange{T}(M + 1, N))...)))
+    end
+end
 
-Base.@propagate_inbounds SPerm(images::NTuple{N,T}) where {N,T} = SPerm{N,T}(images)
-Base.@propagate_inbounds SPerm(images::Integer...) = SPerm(tuple(images...))
+Base.@propagate_inbounds SPerm(::Val{N}, ::Type{T}, images::NTuple{M}) where {N,M,T} = SPerm(Val{N}(), T, NTuple{M,T}(images))
+Base.@propagate_inbounds SPerm(::Val{N}, ::Type{T}, images::Integer...) where {N,T} = SPerm(Val{N}(), T, Tuple(images))
+Base.@propagate_inbounds SPerm(::Val{N}, ::Type{T}, images::AbstractArray) where {N,T} = SPerm(Val{N}(), T, Tuple(images))
+SPerm(::Val{N}, ::Type{T}, perm::AbstractPerm) where {N,T} = @inbounds SPerm(Val{N}(), T, images(perm))
+
+Base.@propagate_inbounds SPerm{N,T}(images...) where {N,T} = SPerm(Val{N}(), T, images...)
+Base.@propagate_inbounds SPerm{N}(images...) where {N} = SPerm(Val{N}(), Int, images...)
+
+Base.@propagate_inbounds SPerm(images::NTuple{N}) where {N} = SPerm(Val{N}(), Int, images)
+Base.@propagate_inbounds SPerm(images::Integer...) = SPerm(Tuple(images))
 Base.@propagate_inbounds SPerm(images::AbstractArray) = SPerm(Tuple(images))
+SPerm(perm::AbstractPerm) = @inbounds SPerm(images(perm))
 
 SPerm{N,T}() where {N,T} = identity_perm(SPerm{N,T})
+SPerm{N}() where {N} = identity_perm(SPerm{N,Int})
 
 # Get image
-Base.@propagate_inbounds Base.getindex(a::SPerm, i) = a.images[i]
+Base.@propagate_inbounds Base.getindex(a::SPerm, i) = convert(Int, a.images[i])
 
 # Multiply from left to right (the left permutation applies first)
 @generated function Base.:*(a::SPerm{N,T}, b::SPerm{N,T}) where {N,T}
@@ -29,7 +47,7 @@ Base.@propagate_inbounds Base.getindex(a::SPerm, i) = a.images[i]
     # which is only available for @generated functions.
     if N < 32
         # Initialize tuple with generator is faster but limit to N < 32
-        return :(_mul_collect(a,b))
+        return :(_mul_collect(a, b))
     else
         # Warning: unsafe code (for the sake of performance)
         store_exprs = [:(unsafe_store!(ptr, convert($T, @inbounds b[a[$i]]), $i)) for i in 1:N]
