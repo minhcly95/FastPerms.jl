@@ -3,6 +3,7 @@ abstract type AbstractPerm{N} <: AbstractVector{Int} end
 
 # Degree = number of elements on which the permutation acts
 degree(::Type{<:AbstractPerm{N}}) where {N} = N
+degree(::AbstractPerm{N}) where {N} = N
 
 # Treating permutation as a vector
 Base.size(::AbstractPerm{N}) where {N} = (N,)
