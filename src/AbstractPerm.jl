@@ -7,6 +7,12 @@ degree(::Type{<:AbstractPerm{N}}) where {N} = N
 # Treating permutation as a vector
 Base.size(::AbstractPerm{N}) where {N} = (N,)
 
+# Use i^a to apply permutation on the right
+Base.@propagate_inbounds Base.:^(i::Integer, a::AbstractPerm) = a[i]
+
+# Use a(i) to apply permutation on the left
+Base.@propagate_inbounds (a::AbstractPerm)(i::Integer) = a[i]
+
 # Get all the images as a tuple
 @generated function images(a::AbstractPerm{N}) where {N}
     return Expr(:tuple, [:(@inbounds a[$i]) for i in 1:N]...)
@@ -18,10 +24,7 @@ num_perms(::Val{N}) where {N} = num_perms(Val{N-1}()) * N
 num_perms(::AbstractPerm{N}) where {N} = num_perms(Val{N}())
 num_perms(::Type{<:AbstractPerm{N}}) where {N} = num_perms(Val{N}())
 
-# Treating permutation as a function
-Base.@propagate_inbounds (a::AbstractPerm)(i::Integer) = a[i]
-
-# General multiplication
+# General multiplication is from left-to-right
 Base.:*(a::AbstractPerm, b::AbstractPerm) = *(promote(a,b)...)
 
 # Use composition to multiply from right-to-left
@@ -39,8 +42,9 @@ identity_perm(a::AbstractPerm) = identity_perm(typeof(a))
 Base.one(type::Type{<:AbstractPerm}) = identity_perm(type)
 Base.one(a::AbstractPerm) = identity_perm(a)
 
-# Conjugate b * a * inv(b)
-Base.conj(a::AbstractPerm, b::AbstractPerm) = b * a * inv(b)
+# Conjugate a^b = inv(b) * a * b
+Base.conj(a::AbstractPerm, b::AbstractPerm) = inv(b) * a * b
+Base.:^(a::AbstractPerm, b::AbstractPerm) = conj(a, b)
 
 # Power
 Base.:^(a::AbstractPerm, p::Integer) = p >= 0 ? Base.power_by_squaring(a, p) : Base.power_by_squaring(inv(a), -p)

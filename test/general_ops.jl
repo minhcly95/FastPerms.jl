@@ -62,10 +62,10 @@
 
             # Conjugate
             for (a, b) in zip(As, Bs)
-                @test conj(a, b) == b * a * inv(b)
-                @test conj(b, a) == a * b * inv(a)
-                @test conj(conj(a, b), inv(b)) == a
-                @test conj(a, b) * conj(inv(a), b) == one(P)
+                @test a^b == inv(b) * a * b
+                @test b^a == inv(a) * b * a
+                @test (a^b)^inv(b) == a
+                @test a^b * inv(a)^b == one(P)
             end
 
             # Power
