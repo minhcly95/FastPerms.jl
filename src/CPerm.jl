@@ -73,26 +73,19 @@ end
 
 # Multiply from left to right (the left permutation applies first)
 @generated function Base.:*(a::CPerm{N}, b::CPerm{N}) where {N}
-    # The implementation of the function depends on N,
-    # which is only available for @generated functions.
+    # If N < 16, we start from bit 4.
+    # If N = 16, we start from bit 0.
     range = N == 16 ? (0:N-1) : (1:N)
-    store_exprs = [
-        quote
-            j = aa & 0xf            # j = a[i]
-            k = (bb >> 4j) & 0xf    # k = b[j] = b[a[i]]
-            cc |= k << $(4i)        # c[i] = k = b[a[i]]
-            aa >>= 4
-        end for i in range
-    ]
-    store_block = Expr(:block, store_exprs...)
     return quote
-        # If N < 16, we start from bit 4.
-        # If N = 16, we start from bit 0.
-        aa = $(N == 16 ? :(a.data) : :(a.data >> 4))
+        aa = a.data
         bb = b.data
         cc = UInt64(0)
 
-        $store_block
+        for i in $range
+            j = (aa >> 4i) & 0xf    # j = a[i]
+            k = (bb >> 4j) & 0xf    # k = b[j] = b[a[i]]
+            cc |= k << 4i           # c[i] = k = b[a[i]]
+        end
 
         return CPerm(Val{$N}(), Val{false}(), cc)
     end
@@ -100,24 +93,17 @@ end
 
 # Inverse
 @generated function Base.inv(a::CPerm{N}) where {N}
-    # The implementation of the function depends on N,
-    # which is only available for @generated functions.
+    # If N < 16, we start from bit 4.
+    # If N = 16, we start from bit 0.
     range = N == 16 ? (0:N-1) : (1:N)
-    store_exprs = [
-        quote
-            j = aa & 0xf        # j = a[i]
-            cc |= $i << 4j      # c[j] = i
-            aa >>= 4
-        end for i in range
-    ]
-    store_block = Expr(:block, store_exprs...)
     return quote
-        # If N < 16, we start from bit 4.
-        # If N = 16, we start from bit 0.
-        aa = $(N == 16 ? :(a.data) : :(a.data >> 4))
+        aa = a.data
         cc = UInt64(0)
 
-        $store_block
+        for i in $range
+            j = (aa >> 4i) & 0xf    # j = a[i]
+            cc |= i << 4j           # c[j] = i
+        end
 
         return CPerm(Val{$N}(), Val{false}(), cc)
     end

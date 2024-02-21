@@ -1,7 +1,7 @@
 # Benchmark Report for */home/bqminh/.julia/dev/FastPerms.jl*
 
 ## Job Properties
-* Time of benchmark: 19 Feb 2024 - 15:56
+* Time of benchmark: 20 Feb 2024 - 22:50
 * Package commit: dirty
 * Julia commit: 7790d6
 * Julia command flags: None
@@ -15,58 +15,58 @@ The percentages accompanying time and memory values in the below table are noise
 time/memory value for a given benchmark is expected to fall within this percentage of the reported value.
 An empty cell means that the value was zero.
 
-| ID                             | time            | GC time | memory | allocations |
-|--------------------------------|----------------:|--------:|-------:|------------:|
-| `["CPerm{12}", "inv"]`         |  11.586 ns (5%) |         |        |             |
-| `["CPerm{12}", "mul"]`         |  14.076 ns (5%) |         |        |             |
-| `["CPerm{16}", "inv"]`         |  14.593 ns (5%) |         |        |             |
-| `["CPerm{16}", "mul"]`         |  17.611 ns (5%) |         |        |             |
-| `["CPerm{4}", "inv"]`          |   6.575 ns (5%) |         |        |             |
-| `["CPerm{4}", "mul"]`          |   8.584 ns (5%) |         |        |             |
-| `["CPerm{8}", "inv"]`          |   8.082 ns (5%) |         |        |             |
-| `["CPerm{8}", "mul"]`          |  11.573 ns (5%) |         |        |             |
-| `["LPerm{3}", "inv"]`          |   5.061 ns (5%) |         |        |             |
-| `["LPerm{3}", "mul"]`          |   6.126 ns (5%) |         |        |             |
-| `["LPerm{4}", "inv"]`          |   5.047 ns (5%) |         |        |             |
-| `["LPerm{4}", "mul"]`          |   6.142 ns (5%) |         |        |             |
-| `["LPerm{5}", "inv"]`          |   5.560 ns (5%) |         |        |             |
-| `["LPerm{5}", "mul"]`          |   6.126 ns (5%) |         |        |             |
-| `["SPerm{12, Int64}", "inv"]`  |  18.079 ns (5%) |         |        |             |
-| `["SPerm{12, Int64}", "mul"]`  |  11.423 ns (5%) |         |        |             |
-| `["SPerm{12, UInt8}", "inv"]`  |  16.326 ns (5%) |         |        |             |
-| `["SPerm{12, UInt8}", "mul"]`  |  12.460 ns (5%) |         |        |             |
-| `["SPerm{128, Int64}", "inv"]` | 112.735 ns (5%) |         |        |             |
-| `["SPerm{128, Int64}", "mul"]` | 174.048 ns (5%) |         |        |             |
-| `["SPerm{128, UInt8}", "inv"]` |  82.284 ns (5%) |         |        |             |
-| `["SPerm{128, UInt8}", "mul"]` | 201.766 ns (5%) |         |        |             |
-| `["SPerm{16, Int64}", "inv"]`  |  26.099 ns (5%) |         |        |             |
-| `["SPerm{16, Int64}", "mul"]`  |  17.803 ns (5%) |         |        |             |
-| `["SPerm{16, UInt8}", "inv"]`  |  23.587 ns (5%) |         |        |             |
-| `["SPerm{16, UInt8}", "mul"]`  |  31.608 ns (5%) |         |        |             |
-| `["SPerm{24, Int64}", "inv"]`  |  30.686 ns (5%) |         |        |             |
-| `["SPerm{24, Int64}", "mul"]`  |  29.130 ns (5%) |         |        |             |
-| `["SPerm{24, UInt8}", "inv"]`  |  27.607 ns (5%) |         |        |             |
-| `["SPerm{24, UInt8}", "mul"]`  |  52.188 ns (5%) |         |        |             |
-| `["SPerm{32, Int64}", "inv"]`  |  36.833 ns (5%) |         |        |             |
-| `["SPerm{32, Int64}", "mul"]`  |  65.844 ns (5%) |         |        |             |
-| `["SPerm{32, UInt8}", "inv"]`  |  35.110 ns (5%) |         |        |             |
-| `["SPerm{32, UInt8}", "mul"]`  |  46.164 ns (5%) |         |        |             |
-| `["SPerm{4, Int64}", "inv"]`   |  14.564 ns (5%) |         |        |             |
-| `["SPerm{4, Int64}", "mul"]`   |   6.048 ns (5%) |         |        |             |
-| `["SPerm{4, UInt8}", "inv"]`   |   6.757 ns (5%) |         |        |             |
-| `["SPerm{4, UInt8}", "mul"]`   |  18.005 ns (5%) |         |        |             |
-| `["SPerm{48, Int64}", "inv"]`  |  51.632 ns (5%) |         |        |             |
-| `["SPerm{48, Int64}", "mul"]`  |  65.735 ns (5%) |         |        |             |
-| `["SPerm{48, UInt8}", "inv"]`  |  48.148 ns (5%) |         |        |             |
-| `["SPerm{48, UInt8}", "mul"]`  |  74.244 ns (5%) |         |        |             |
-| `["SPerm{64, Int64}", "inv"]`  |  62.548 ns (5%) |         |        |             |
-| `["SPerm{64, Int64}", "mul"]`  |  83.767 ns (5%) |         |        |             |
-| `["SPerm{64, UInt8}", "inv"]`  |  50.203 ns (5%) |         |        |             |
-| `["SPerm{64, UInt8}", "mul"]`  |  98.366 ns (5%) |         |        |             |
-| `["SPerm{8, Int64}", "inv"]`   |  16.575 ns (5%) |         |        |             |
-| `["SPerm{8, Int64}", "mul"]`   |   7.577 ns (5%) |         |        |             |
-| `["SPerm{8, UInt8}", "inv"]`   |  17.073 ns (5%) |         |        |             |
-| `["SPerm{8, UInt8}", "mul"]`   |   8.500 ns (5%) |         |        |             |
+| ID                             | time           | GC time | memory | allocations |
+|--------------------------------|---------------:|--------:|-------:|------------:|
+| `["CPerm{12}", "inv"]`         | 10.084 ns (5%) |         |        |             |
+| `["CPerm{12}", "mul"]`         | 12.155 ns (5%) |         |        |             |
+| `["CPerm{16}", "inv"]`         | 11.576 ns (5%) |         |        |             |
+| `["CPerm{16}", "mul"]`         | 13.069 ns (5%) |         |        |             |
+| `["CPerm{4}", "inv"]`          |  6.574 ns (5%) |         |        |             |
+| `["CPerm{4}", "mul"]`          |  8.060 ns (5%) |         |        |             |
+| `["CPerm{8}", "inv"]`          |  8.082 ns (5%) |         |        |             |
+| `["CPerm{8}", "mul"]`          | 10.076 ns (5%) |         |        |             |
+| `["LPerm{3}", "inv"]`          |  5.546 ns (5%) |         |        |             |
+| `["LPerm{3}", "mul"]`          |  5.568 ns (5%) |         |        |             |
+| `["LPerm{4}", "inv"]`          |  5.085 ns (5%) |         |        |             |
+| `["LPerm{4}", "mul"]`          |  6.129 ns (5%) |         |        |             |
+| `["LPerm{5}", "inv"]`          |  5.085 ns (5%) |         |        |             |
+| `["LPerm{5}", "mul"]`          |  5.566 ns (5%) |         |        |             |
+| `["SPerm{12, Int64}", "inv"]`  | 18.070 ns (5%) |         |        |             |
+| `["SPerm{12, Int64}", "mul"]`  | 11.590 ns (5%) |         |        |             |
+| `["SPerm{12, UInt8}", "inv"]`  | 16.339 ns (5%) |         |        |             |
+| `["SPerm{12, UInt8}", "mul"]`  | 11.704 ns (5%) |         |        |             |
+| `["SPerm{128, Int64}", "inv"]` | 93.397 ns (5%) |         |        |             |
+| `["SPerm{128, Int64}", "mul"]` | 98.457 ns (5%) |         |        |             |
+| `["SPerm{128, UInt8}", "inv"]` | 76.755 ns (5%) |         |        |             |
+| `["SPerm{128, UInt8}", "mul"]` | 76.304 ns (5%) |         |        |             |
+| `["SPerm{16, Int64}", "inv"]`  | 20.578 ns (5%) |         |        |             |
+| `["SPerm{16, Int64}", "mul"]`  | 16.080 ns (5%) |         |        |             |
+| `["SPerm{16, UInt8}", "inv"]`  | 19.576 ns (5%) |         |        |             |
+| `["SPerm{16, UInt8}", "mul"]`  | 16.691 ns (5%) |         |        |             |
+| `["SPerm{24, Int64}", "inv"]`  | 24.619 ns (5%) |         |        |             |
+| `["SPerm{24, Int64}", "mul"]`  | 22.952 ns (5%) |         |        |             |
+| `["SPerm{24, UInt8}", "inv"]`  | 22.734 ns (5%) |         |        |             |
+| `["SPerm{24, UInt8}", "mul"]`  | 16.101 ns (5%) |         |        |             |
+| `["SPerm{32, Int64}", "inv"]`  | 46.705 ns (5%) |         |        |             |
+| `["SPerm{32, Int64}", "mul"]`  | 40.050 ns (5%) |         |        |             |
+| `["SPerm{32, UInt8}", "inv"]`  | 28.596 ns (5%) |         |        |             |
+| `["SPerm{32, UInt8}", "mul"]`  | 19.632 ns (5%) |         |        |             |
+| `["SPerm{4, Int64}", "inv"]`   | 14.563 ns (5%) |         |        |             |
+| `["SPerm{4, Int64}", "mul"]`   |  6.060 ns (5%) |         |        |             |
+| `["SPerm{4, UInt8}", "inv"]`   |  6.767 ns (5%) |         |        |             |
+| `["SPerm{4, UInt8}", "mul"]`   |  6.067 ns (5%) |         |        |             |
+| `["SPerm{48, Int64}", "inv"]`  | 40.725 ns (5%) |         |        |             |
+| `["SPerm{48, Int64}", "mul"]`  | 40.150 ns (5%) |         |        |             |
+| `["SPerm{48, UInt8}", "inv"]`  | 36.662 ns (5%) |         |        |             |
+| `["SPerm{48, UInt8}", "mul"]`  | 29.626 ns (5%) |         |        |             |
+| `["SPerm{64, Int64}", "inv"]`  | 49.689 ns (5%) |         |        |             |
+| `["SPerm{64, Int64}", "mul"]`  | 51.549 ns (5%) |         |        |             |
+| `["SPerm{64, UInt8}", "inv"]`  | 44.675 ns (5%) |         |        |             |
+| `["SPerm{64, UInt8}", "mul"]`  | 42.198 ns (5%) |         |        |             |
+| `["SPerm{8, Int64}", "inv"]`   | 16.570 ns (5%) |         |        |             |
+| `["SPerm{8, Int64}", "mul"]`   |  7.996 ns (5%) |         |        |             |
+| `["SPerm{8, UInt8}", "inv"]`   | 17.070 ns (5%) |         |        |             |
+| `["SPerm{8, UInt8}", "mul"]`   | 18.032 ns (5%) |         |        |             |
 
 ## Benchmark Group List
 Here's a list of all the benchmark groups executed by this job:
@@ -109,13 +109,13 @@ Platform Info:
   uname: Linux 5.15.0-94-generic #104-Ubuntu SMP Tue Jan 9 15:25:40 UTC 2024 x86_64 x86_64
   CPU: Intel(R) Core(TM) M-5Y10c CPU @ 0.80GHz: 
               speed         user         nice          sys         idle          irq
-       #1   934 MHz       5235 s          3 s       2277 s      35317 s          0 s
-       #2  2000 MHz       4602 s         54 s       2314 s      35822 s          0 s
-       #3   500 MHz       4396 s          0 s       2332 s      36013 s          0 s
-       #4   500 MHz       4451 s         85 s       2364 s      35880 s          0 s
-  Memory: 7.653850555419922 GB (4596.3203125 MB free)
-  Uptime: 4329.5 sec
-  Load Avg:  2.47  1.37  1.14
+       #1   500 MHz       3713 s          3 s       1453 s      24606 s          0 s
+       #2  2000 MHz       4432 s        100 s       1462 s      23787 s          0 s
+       #3   924 MHz       2679 s         15 s       1501 s      25544 s          0 s
+       #4   500 MHz       4527 s         14 s       1445 s      23777 s          0 s
+  Memory: 7.653839111328125 GB (4650.74609375 MB free)
+  Uptime: 2996.91 sec
+  Load Avg:  0.99  0.66  0.55
   WORD_SIZE: 64
   LIBM: libopenlibm
   LLVM: libLLVM-15.0.7 (ORCJIT, broadwell)
