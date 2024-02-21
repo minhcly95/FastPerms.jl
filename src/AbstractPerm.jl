@@ -21,12 +21,12 @@ end
 
 # Get total number of permutations of N items
 num_perms(::Val{1}) = 1
-num_perms(::Val{N}) where {N} = num_perms(Val{N-1}()) * N
+num_perms(::Val{N}) where {N} = num_perms(Val{N - 1}()) * N
 num_perms(::AbstractPerm{N}) where {N} = num_perms(Val{N}())
 num_perms(::Type{<:AbstractPerm{N}}) where {N} = num_perms(Val{N}())
 
 # General multiplication is from left-to-right
-Base.:*(a::AbstractPerm, b::AbstractPerm) = *(promote(a,b)...)
+Base.:*(a::AbstractPerm, b::AbstractPerm) = *(promote(a, b)...)
 
 # Use composition to multiply from right-to-left
 Base.:∘(a::AbstractPerm, b::AbstractPerm) = b * a
@@ -50,11 +50,40 @@ Base.:^(a::AbstractPerm, b::AbstractPerm) = conj(a, b)
 # Power
 Base.:^(a::AbstractPerm, p::Integer) = p >= 0 ? Base.power_by_squaring(a, p) : Base.power_by_squaring(inv(a), -p)
 
-Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{-3}) = inv(a*a*a)
-Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{-2}) = inv(a*a)
+Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{-3}) = inv(a * a * a)
+Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{-2}) = inv(a * a)
 Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{-1}) = inv(a)
 Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{0}) = identity_perm(a)
 Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{1}) = a
-Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{2}) = a*a
-Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{3}) = a*a*a
+Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{2}) = a * a
+Base.literal_pow(::typeof(^), a::AbstractPerm, ::Val{3}) = a * a * a
+
+# Parity
+function Base.iseven(a::AbstractPerm{N}) where {N}
+    # Unsafe code to avoid memory allocation
+    visited = Ref(tuple((false for i in 1:N)...))
+    ptr = Base.unsafe_convert(Ptr{Bool}, pointer_from_objref(visited))
+    setv(i) = unsafe_store!(ptr, true, i)
+    getv(i) = unsafe_load(ptr, i)
+
+    odd = false
+    GC.@preserve visited for i in 1:N
+        getv(i) && continue
+        setv(i)
+        # Find the cycle containing i
+        j = @inbounds a[i]
+        setv(j)
+        cycle_len = 1
+        while j != i
+            j = @inbounds a[j]
+            setv(j)
+            cycle_len += 1
+        end
+        # Even-length cycles are odd
+        odd ⊻= iseven(cycle_len)
+    end
+    return !odd
+end
+Base.isodd(a::AbstractPerm) = !iseven(a)
+Base.sign(a::AbstractPerm) = iseven(a) ? 1 : -1
 

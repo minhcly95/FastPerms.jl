@@ -77,6 +77,13 @@
                 @test a^(-1) == inv(a)
                 @test a^(-2) == inv(a) * inv(a)
             end
+
+            # Parity
+            @test isodd(one(P)) == false
+            for (a, b) in zip(As, Bs)
+                @test isodd(a * b) == isodd(a) ⊻ isodd(b)
+                @test isodd(b * a) == isodd(a) ⊻ isodd(b)
+            end
         end
     end
 end
