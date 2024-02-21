@@ -4,7 +4,7 @@
     if M > N
         throw(ArgumentError("cannot convert $a to a lower degree permutation"))
     else
-        return :(return @inbounds SPerm{N,Int}(a))
+        return :(return @inbounds SPerm{N,T}(a))
     end
 end
 Base.convert(::Type{SPerm{N,T}}, a::SPerm{N,T}) where {N,T} = a
