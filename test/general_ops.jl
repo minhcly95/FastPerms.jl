@@ -81,8 +81,15 @@
             # Parity
             @test isodd(one(P)) == false
             for (a, b) in zip(As, Bs)
+                @test iseven(inv(a)) == iseven(a)
+                @test iseven(a^2) == true
+                @test iseven(a^3) == iseven(a)
+
                 @test isodd(a * b) == isodd(a) ⊻ isodd(b)
                 @test isodd(b * a) == isodd(a) ⊻ isodd(b)
+
+                @test iseven(a^b) == iseven(a)
+                @test isodd(b^a) == isodd(b)
             end
         end
     end

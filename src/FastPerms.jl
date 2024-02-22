@@ -13,6 +13,7 @@ include("LPerm.jl")
 include("random.jl")
 include("conversion.jl")
 include("promotion.jl")
+include("cycle.jl")
 
 export AbstractPerm
 export SPerm
@@ -22,5 +23,7 @@ export LPerm
 export degree, images
 export identity_perm
 export num_perms
+
+export cycle, @perm_str
 
 end
