@@ -30,14 +30,19 @@ Base.@propagate_inbounds cycle(elements::Integer...) = cycle(SPerm, tuple(elemen
 Base.@propagate_inbounds cycle(elements::AbstractVector) = cycle(SPerm, Tuple(elements))
 
 # Create a permutation from cycle notation
-function Base.parse(T::Type{<:AbstractPerm}, str::AbstractString)
+function Base.parse(T::Type{<:AbstractPerm}, str::AbstractString; rev::Bool=false)
     a = SPerm{1}()
     for match in eachmatch(r"\((.*?)\)", str)
         cycle_str = match.captures[1]
         elems_str = split(cycle_str, [' ', ','], keepempty=false)
         isempty(elems_str) && continue
         elems = parse.(Int, elems_str)
-        a *= cycle(Tuple(elems))
+        b = cycle(elems)
+        if rev
+            a = b * a
+        else
+            a = a * b
+        end
     end
     return T(a)
 end
@@ -46,3 +51,6 @@ macro perm_str(str)
     return :(parse(SPerm, $str))
 end
 
+macro rperm_str(str)
+    return :(parse(SPerm, $str, rev=true))
+end

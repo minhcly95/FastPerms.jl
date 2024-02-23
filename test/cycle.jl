@@ -20,8 +20,14 @@
     @testset "Parse" begin
         @test isone(perm"")
         @test isone(parse(SPerm{8}, ""))
+        
         @test perm"(2,5)(1,3,7)" == [3, 5, 7, 4, 2, 6, 1]
+        @test rperm"(2,5)(1,3,7)" == [3, 5, 7, 4, 2, 6, 1]
+
         @test perm"(1 5)(2 5)(3 5)(4 5)" == [2, 3, 4, 5, 1]
+        @test rperm"(1 5)(2 5)(3 5)(4 5)" == [5, 1, 2, 3, 4]
+
         @test perm"(6, 8,2) (4   7)" == [1, 6, 3, 7, 5, 8, 4, 2]
+        @test rperm"(6, 8,2) (4   7)" == [1, 6, 3, 7, 5, 8, 4, 2]
     end
 end

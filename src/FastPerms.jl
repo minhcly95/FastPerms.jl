@@ -24,6 +24,6 @@ export degree, images
 export identity_perm
 export num_perms
 
-export cycle, @perm_str
+export cycle, @perm_str, @rperm_str
 
 end

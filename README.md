@@ -33,6 +33,22 @@ c = LPerm([2,3,4,1])    # Map (1,2,3,4) to (2,3,4,1)
 e = SPerm{8}()
 @assert e == one(SPerm{8}) == identity_perm(SPerm{8})
 
+# Create a cyclic permutation
+d = cycle(1,4,6)        # Map 1 to 4, 4 to 6, and 6 to 1
+@assert d == [4,2,3,6,5,1]
+
+f = cycle(CPerm{8}, 2,5,3)
+@assert f == [1,5,2,4,3,6,7,8]
+
+# Create a permutation from cycle notation
+g = perm"(1,4,6)"
+@assert g == d
+
+h = perm"(1 2 3)(1 2)"  # The cycles are applied left-to-right in perm"..."
+j = rperm"(1 2 3)(1 2)" # The cycles are applied right-to-left in rperm"..."
+@assert h == perm"(2 3)"
+@assert j == perm"(1 3)"
+
 # Get degree of a permutation (the degree of an N-permutation is N)
 @assert degree(a) == 4
 @assert degree(e) == 8
@@ -69,6 +85,10 @@ e = SPerm{8}()
 # Generate random permutations
 r = rand(SPerm{16})
 s,t,u,v = rand(CPerm{8}, 4)
+
+# Parity
+@assert iseven(perm"(1 2 3)")
+@assert isodd(perm"(1 2 3 4)")
 
 # Add @inbounds to skip bound-checking (for even faster code)
 d = @inbounds SPerm(2,1,4,3)
