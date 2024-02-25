@@ -62,6 +62,9 @@ CPerm(perm::AbstractPerm) = @inbounds CPerm(images(perm))
 
 CPerm{N}() where {N} = identity_perm(CPerm{N})
 
+# Copy
+Base.copy(a::CPerm) = a
+
 # Get image
 function Base.getindex(a::CPerm{N}, i::Integer) where {N}
     @boundscheck i in 1:N || throw(ArgumentError("index [$i] is out of bound (1:$N)"))

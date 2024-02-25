@@ -91,6 +91,9 @@ LPerm(perm::AbstractPerm) = @inbounds LPerm(images(perm))
 end
 LPerm{N}() where {N} = identity_perm(LPerm{N})
 
+# Copy
+Base.copy(a::LPerm) = a
+
 # Get image
 function Base.getindex(a::LPerm{N}, i::Integer) where {N}
     @boundscheck i in 1:N || throw(ArgumentError("index [$i] is out of bound (1:$N)"))

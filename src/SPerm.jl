@@ -37,6 +37,9 @@ SPerm(perm::AbstractPerm) = @inbounds SPerm(images(perm))
 SPerm{N,T}() where {N,T} = identity_perm(SPerm{N,T})
 SPerm{N}() where {N} = identity_perm(SPerm{N,Int})
 
+# Copy
+Base.copy(a::SPerm) = a
+
 # Get image
 Base.@propagate_inbounds Base.getindex(a::SPerm, i) = convert(Int, a.images[i])
 

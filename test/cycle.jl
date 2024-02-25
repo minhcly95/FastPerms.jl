@@ -12,7 +12,7 @@
     end
 
     @testset "Order" begin
-        for N in 2:10
+        for N in 1:10
             @test isone(cycle(1:N)^N)
         end
     end

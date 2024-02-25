@@ -1,7 +1,7 @@
 name = "FastPerms"
 uuid = "4f7ee846-71eb-4ef0-b8b4-b98ea9e842ee"
 authors = ["Bui Quang Minh <minhcly95@outlook.com> and contributors"]
-version = "0.3.1"
+version = "0.3.2"
 
 [deps]
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
